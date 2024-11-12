@@ -1,0 +1,46 @@
+services:
+  app:
+    image: jox51/pocketbase-manager-docked:generate-updated
+    ports:
+      - "8000:8000"
+      - "5173:5173"
+    working_dir: /var/www/html
+    volumes:
+      - ./.env:/var/www/html/.env
+      - /var/run/docker.sock:/var/run/docker.sock
+      - caddy-file:/var/www/html/scripts/pb-manager-scripts/caddy
+    networks:
+      - default
+      - pbnet
+    privileged: true
+    command: php artisan serve --host=0.0.0.0
+  caddy:
+    image: caddy:latest
+    restart: always
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - caddy-file:/etc/caddy
+    networks:
+      - pbnet
+      # Initialize the Caddyfile and then start Caddy
+    command: ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]
+    depends_on:
+      - app
+
+volumes:
+  pocketbase_data:
+  caddy_data:
+  caddy_config:
+  caddy-file:
+
+networks:
+  pbnet:
+    name: pb-manager_pbnet
+    driver: bridge
