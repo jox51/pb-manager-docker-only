@@ -6,7 +6,7 @@ services:
       - "5173:5173"
     working_dir: /var/www/html
     volumes:
-      - ./.env:/var/www/html/.env
+      -  #./.env:/var/www/html/.env
       - /var/run/docker.sock:/var/run/docker.sock
       - caddy-file:/var/www/html/scripts/pb-manager-scripts/caddy
     networks:
